@@ -1,0 +1,33 @@
+#cloud-config
+# cloud-init-server.yaml: Part I, no Docker packages yet
+# First line MUST be #cloud-config or cloud-init ignores this file.
+hostname: ${hostname}
+fqdn: ${hostname}.local
+
+users:
+  - default
+  - name: ${student_name}
+    gecos: "Student User"
+    sudo: "ALL=(ALL) NOPASSWD:ALL"
+    groups: users, admin
+    shell: /bin/bash
+    lock_passwd: false
+    hashed_passwd: $6$uPJ6AXTlug/SHExe$JuU7R3b/Duw7FvwaO8uOTY1c8uopefxyxjoYi1w0.GHVI4/HKffVQfDd6Q3VgMf.Rs9OsVs/muy.qyFuJO5vg1
+    ssh_authorized_keys:
+      - ${ssh_public_key}
+
+ssh_pwauth: true
+
+package_update: true
+packages:
+  - openssh-server
+  - curl
+  - wget
+  - vim
+  - git
+  - net-tools
+
+runcmd:
+  - echo 'root:$6$uPJ6AXTlug/SHExe$JuU7R3b/Duw7FvwaO8uOTY1c8uopefxyxjoYi1w0.GHVI4/HKffVQfDd6Q3VgMf.Rs9OsVs/muy.qyFuJO5vg1' | chpasswd -e
+  - systemctl restart sshd
+  - echo "${hostname} - SYS-350 Enterprise VM" > /etc/motd
